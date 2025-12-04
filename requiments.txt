@@ -1,0 +1,7 @@
+numpy
+threading
+requests
+collections
+scapy.all
+colorama
+psutil

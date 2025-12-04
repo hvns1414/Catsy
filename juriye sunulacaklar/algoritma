@@ -1,0 +1,33 @@
+AlgoritmaGirdi: Ağ Arayüzü Adı (eth0), Eşik Değeri (THRESHOLD), Beyaz Liste (WHITELIST).Çıktı: Engellenmiş IP Adresleri, Olay Logları.1. ⚙️ Başlatma (Initialization)Paket sayacı (packet_counts) ve son sıfırlama zamanını (last_reset_time) sıfırla.THRESHOLD (Paket/saniye) ve kullanılacak ağ arayüzünü (NETWORK_INTERFACE) yapılandır.Root/Sudo Yetkisini Kontrol Et: Yetki yoksa, kullanıcıyı uyar ve çıkış yap.Güvenlik duvarı motorunu başlat (start_firewall()).2. 🖧 Paket Yakalama ve Ön İşleme (Sniffing Loop)Belirtilen arayüzde sürekli paket yakalamayı başlat (sniff(iface=..., prn=packet_callback)).Her paket geldiğinde packet_callback(packet) fonksiyonunu çağır.3. 🚦 Paket İşleme (packet_callback)Zaman Penceresi Kontrolü: Mevcut zaman ile last_reset_time arasındaki fark TIME_WINDOW'dan büyük veya eşitse, Hız Analizini çağır.Paket IP katmanına sahip mi?Evet: Kaynak IP'yi al (source_ip).Hayır: Sonraki pakete geç.source_ip Beyaz Listede mi?Evet: Paketi yoksay ve geri dön.İmza Tabanlı Kontrol (Nimda Örneği): Hedef/Kaynak portu 80 olan TCP paketi, belirli bir zararlı yazılım imzası içeriyor mu?Evet: Kritik uyarı logla. 4. Gerçek Engellemeyi çağır (gercek_ip_engelle(source_ip)). Paketi yoksay ve geri dön.packet_counts[source_ip] değerini 1 artır.4. 📈 Hız Analizi ve Engelleme Kararı (hiz_analizi)Tüm IP'ler için:Paket Hızı (PPS) hesapla: $PPS = \text{Sayaç} / (\text{Mevcut Zaman} - \text{Son Sıfırlama Zamanı})$$PPS \ge THRESHOLD$ mı?Evet (DDoS Tespiti):GeoIP bilgisi al ve DDoS uyarısını logla.5. Gerçek Engellemeyi çağır (gercek_ip_engelle(ip)).Hayır: Normal trafik olarak işle.packet_counts sayacını temizle ve last_reset_time değerini mevcut zamana ayarla.5. 🧱 Gerçek Engelleme (gercek_ip_engelle)Sistem komutunu çalıştır: subprocess.run("iptables -A INPUT -s IP -j DROP", shell=True, check=True)Engelleme eylemini ve iptables başarısını logla.Engellenen IP'yi src/blacklist.txt dosyasına kaydet.Hata oluşursa (yetki/komut hatası), hata logla.
+AlgoritmaGirdi: Ağ Arayüzü Adı (eth0), 
+Eşik Değeri (THRESHOLD), Beyaz Liste (WHITELIST).
+Çıktı: Engellenmiş IP Adresleri, Olay Logları.1. 
+Başlatma (Initialization)Paket sayacı (packet_counts) ve son sıfırlama zamanını (last_reset_time) sıfırla.
+THRESHOLD (Paket/saniye) ve kullanılacak ağ arayüzünü (NETWORK_INTERFACE) yapılandır.
+Root/Sudo Yetkisini Kontrol Et: Yetki yoksa, kullanıcıyı uyar ve çıkış yap.
+Güvenlik duvarı motorunu başlat (start_firewall()).
+2.  Paket Yakalama ve Ön İşleme (Sniffing Loop)Belirtilen arayüzde sürekli paket yakalamayı başlat (sniff(iface=..., prn=packet_callback)).
+Her paket geldiğinde packet_callback(packet) fonksiyonunu çağır.
+3.  Paket İşleme (packet_callback)Zaman Penceresi Kontrolü: Mevcut zaman ile last_reset_time arasındaki fark TIME_WINDOW'dan büyük veya eşitse, Hız Analizini çağır.Paket IP katmanına sahip mi?Evet: Kaynak IP'yi al (source_ip).
+Hayır: Sonraki pakete geç.source_ip Beyaz Listede mi?Evet: Paketi yoksay ve geri dön.İmza Tabanlı Kontrol (Nimda Örneği): Hedef/Kaynak portu 80 olan TCP paketi, belirli bir zararlı yazılım imzası içeriyor mu?Evet: Kritik uyarı logla. 
+4. Gerçek Engellemeyi çağır (gercek_ip_engelle(source_ip)). 
+Paketi yoksay ve geri dön.packet_counts[source_ip] değerini 1 artır.
+4.  Hız Analizi ve Engelleme Kararı (hiz_analizi)Tüm IP'ler için:Paket Hızı (PPS) hesapla: $PPS = \text{Sayaç} / (\text{Mevcut Zaman} - \text{Son Sıfırlama Zamanı})$$PPS \ge THRESHOLD$ mı?Evet (DDoS Tespiti):GeoIP bilgisi al ve DDoS uyarısını logla.
+5. Gerçek Engellemeyi çağır (gercek_ip_engelle(ip)).Hayır: Normal trafik olarak işle.packet_counts sayacını temizle ve last_reset_time değerini mevcut zamana ayarla.5. 🧱 Gerçek Engelleme (gercek_ip_engelle)Sistem komutunu çalıştır: subprocess.run("iptables -A INPUT -s IP -j DROP", shell=True, check=True)Engelleme eylemini ve iptables başarısını logla.Engellenen IP'yi src/blacklist.
+txt dosyasına kaydet.Hata oluşursa (yetki/komut hatası), hata logla.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
